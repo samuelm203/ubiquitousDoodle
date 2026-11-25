@@ -7,11 +7,17 @@ Das zeigt, dass dieselben Controller auch ohne Webserver funktionieren.
 Funktionen wie in der Vaadin-UI: Dashboard, Kunden (suchen, anlegen, bearbeiten, löschen), Produkte,
 Bestellungen mit Positionen und Status-Workflow (aufgeben, versenden, stornieren).
 
+Zusätzlich gibt es für **ADMIN** den Tab *Konfiguration* (Firmenkonfiguration als `.properties`-Tabelle: Firma wählen,
+filtern, nur Unterschiede, Paging, Zellen bearbeiten oder löschen, gesammelt speichern). Die App hat keinen Login:
+die Rolle kommt aus `-Dorders.role=ADMIN` oder der Umgebungsvariable `ORDERS_ROLE=ADMIN` (Standard: USER, Tab fehlt).
+Die Dateien liegen unter `-Dorders.properties.root` (Standard `./data/properties`, Beispieldaten beim ersten Start).
+
 ## Starten
 
 ```bash
 mvn -q install                          # einmalig im Repo-Root: baut backend-core usw.
 mvn -f app-javafx/pom.xml javafx:run
+ORDERS_ROLE=ADMIN mvn -f app-javafx/pom.xml javafx:run   # mit Konfigurations-Tab
 ```
 
 Beim Start werden Demo-Daten angelegt (`DemoData.seed(backend)`). Beim Beenden sind alle Änderungen weg.
@@ -21,6 +27,7 @@ Beim Start werden Demo-Daten angelegt (`DemoData.seed(backend)`). Beim Beenden s
 | Klasse | Aufgabe |
 |---|---|
 | `OrdersApp` | Einstieg. `InMemoryBackend.create()` + `DemoData.seed(...)`, baut die Tabs |
+| `PropertiesTab` | Firmenkonfiguration (nur ADMIN), nutzt `PropertiesController` und `FilePropertiesRepository` |
 | `DashboardTab`, `CustomersTab`, `ProductsTab`, `OrdersTab` | Views, kennen nur die Controller und DTOs |
 | `Ui` | Hilfsfunktionen: Tabellenspalten, Formatierung, Fehlerdialog bei `DomainException` |
 
