@@ -22,6 +22,11 @@ Zum Zurücksetzen löschst du diesen Ordner.
 
 Produktions-Build: `mvn -Pproduction package`, danach `java -jar app-vaadin/target/app-vaadin-1.0.0-SNAPSHOT.jar`.
 
+**Launcher (Demo/Vergleich):** `node launcher/server.js`, danach http://localhost:9000. Pro Framework eine Kachel mit
+Start/Stop, Status, Log und Link. Zwei laufende Web-Apps lassen sich nebeneinander vergleichen. Web-Frontends starten
+das Vaadin-Backend automatisch mit. Einmalig vorher `mvn install` und `npm install` in den Frontends.
+Port per `LAUNCHER_PORT` änderbar.
+
 Swing-Desktop-App ohne Spring und REST direkt auf dem Backend: siehe `app-swing/README.md`.
 
 ## Architektur

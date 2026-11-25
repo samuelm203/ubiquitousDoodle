@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Framework-Launcher</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { --bg:#f5f6f8; --card:#fff; --ink:#1c2230; --mute:#667085; --line:#e2e5ea; --ok:#12805c; --warn:#b54708; --acc:#2554d6; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#12151c; --card:#1b202b; --ink:#e8ebf2; --mute:#98a2b3; --line:#2b3240; --ok:#3ecf9a; --warn:#f0a35c; --acc:#7da2ff; } }
+  * { box-sizing: border-box }
+  body { margin:0; font:15px/1.4 system-ui,sans-serif; background:var(--bg); color:var(--ink) }
+  header.top { padding:20px 28px 8px } h1 { margin:0; font-size:22px } header.top p { margin:4px 0 0; color:var(--mute) }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; padding:16px 28px }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:8px }
+  .card h2 { margin:0; font-size:17px; display:flex; justify-content:space-between; align-items:center }
+  .tag { font-size:11px; color:var(--mute); border:1px solid var(--line); border-radius:99px; padding:1px 8px }
+  .note { color:var(--mute); font-size:13px; min-height:18px }
+  .st { font-size:13px; display:flex; align-items:center; gap:6px }
+  .dot { width:9px; height:9px; border-radius:50%; background:var(--mute) }
+  .running .dot, .external .dot { background:var(--ok) } .starting .dot, .stopping .dot { background:var(--warn) }
+  .row { display:flex; gap:6px; flex-wrap:wrap; align-items:center }
+  button, a.btn { font:inherit; font-size:13px; padding:5px 11px; border-radius:7px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; text-decoration:none }
+  button.primary { background:var(--acc); border-color:var(--acc); color:#fff }
+  button:disabled { opacity:.45; cursor:default }
+  .toolbar { padding:0 28px; display:flex; gap:12px; align-items:center }
+  .view { display:grid; gap:12px; padding:14px 28px 28px; grid-template-columns:1fr 1fr }
+  .view.single { grid-template-columns:1fr } .view:empty { display:none }
+  .pane { background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden; display:flex; flex-direction:column }
+  .pane header { padding:8px 12px; display:flex; justify-content:space-between; font-weight:600; border-bottom:1px solid var(--line) }
+  .pane iframe { border:0; height:70vh; width:100%; background:#fff }
+  pre { margin:0; padding:10px 12px; height:70vh; overflow:auto; font:12px/1.4 ui-monospace,Consolas,monospace; white-space:pre-wrap }
+  label.cmp { font-size:13px; display:flex; gap:5px; align-items:center }
+</style>
+</head>
+<body>
+<header class="top"><h1>Framework-Launcher</h1><p>Starte die Varianten per Klick. Web-Frontends brauchen das Vaadin-Backend und starten es automatisch mit.</p></header>
+<div class="toolbar"><span style="color:var(--mute);font-size:13px">Vergleich: bis zu zwei laufende Web-Apps auswählen, sie erscheinen nebeneinander.</span><button id="clear" disabled>Ansicht schließen</button></div>
+<div class="grid" id="grid"></div>
+<div class="view" id="view"></div>
+<script>
+const LABEL = { stopped: 'gestoppt', starting: 'startet …', running: 'läuft', stopping: 'stoppt …', external: 'läuft (extern gestartet)' }
+const KIND = { backend: 'Backend + Web', web: 'Web', desktop: 'Desktop' }
+let services = [], selected = [], logs = new Set(), rendered = ''
+
+const post = (p) => fetch(p, { method: 'POST' })
+const isUp = id => { const s = services.find(x => x.id === id); return s && s.url && (s.status === 'running' || s.status === 'external') }
+
+async function load() {
+  services = await (await fetch('/api/state')).json()
+  selected = selected.filter(isUp)
+  const key = JSON.stringify(services) + selected + [...logs]
+  if (key !== rendered) { rendered = key; render() }
+  for (const id of logs) updateLog(id)
+}
+
+function render() {
+  const grid = document.getElementById('grid'); grid.innerHTML = ''
+  for (const s of services) {
+    const up = s.status === 'running' || s.status === 'external'
+    const c = document.createElement('div'); c.className = 'card ' + s.status
+    c.innerHTML = `<h2>${s.name}<span class="tag">${KIND[s.kind]}</span></h2>
+      <div class="note">${s.note || (s.needs.length ? 'braucht das Vaadin-Backend (Port 8080)' : '')}</div>
+      <div class="st"><span class="dot"></span>${LABEL[s.status]}${s.port ? ' · Port ' + s.port : ''}</div>
+      <div class="row"></div>`
+    const row = c.querySelector('.row')
+    const btn = (t, cls, fn, dis) => { const b = document.createElement('button'); b.textContent = t; b.className = cls || ''; b.disabled = !!dis; b.onclick = fn; row.append(b) }
+    if (s.status === 'external') btn('Läuft extern', '', null, true)
+    else if (s.status === 'stopped') btn('Starten', 'primary', async () => { await post('/api/start/' + s.id); load() })
+    else btn('Stoppen', '', async () => { await post('/api/stop/' + s.id); load() }, s.status === 'stopping')
+    if (s.url && up) {
+      const a = document.createElement('a'); a.className = 'btn'; a.href = s.url; a.target = '_blank'; a.textContent = 'Öffnen'; row.append(a)
+      const l = document.createElement('label'); l.className = 'cmp'
+      l.innerHTML = `<input type="checkbox" ${selected.includes(s.id) ? 'checked' : ''}> Vergleich`
+      l.firstChild.onchange = e => toggle(s.id, e.target.checked)
+      row.append(l)
+    }
+    if (s.status !== 'stopped' && s.status !== 'external' || logs.has(s.id))
+      btn(logs.has(s.id) ? 'Log aus' : 'Log', '', () => { logs.has(s.id) ? logs.delete(s.id) : logs.add(s.id); rendered = ''; load() })
+    grid.append(c)
+  }
+  renderView()
+}
+function toggle(id, on) { selected = on ? [...selected, id].slice(-2) : selected.filter(x => x !== id); rendered = ''; load() }
+document.getElementById('clear').onclick = () => { selected = []; logs.clear(); rendered = ''; load() }
+
+function renderView() {
+  const v = document.getElementById('view'); v.innerHTML = ''
+  document.getElementById('clear').disabled = !selected.length && !logs.size
+  const panes = [...selected.map(id => ['app', id]), ...[...logs].map(id => ['log', id])]
+  v.className = 'view' + (panes.length === 1 ? ' single' : '')
+  for (const [type, id] of panes) {
+    const s = services.find(x => x.id === id), p = document.createElement('div'); p.className = 'pane'
+    p.innerHTML = `<header><span>${s.name}${type === 'log' ? ' – Log' : ''}</span>${s.url && type === 'app' ? `<a href="${s.url}" target="_blank">neuer Tab</a>` : ''}</header>` +
+      (type === 'app' ? `<iframe src="${s.url}"></iframe>` : `<pre id="log-${id}"></pre>`)
+    v.append(p)
+  }
+}
+async function updateLog(id) {
+  const el = document.getElementById('log-' + id); if (!el) return
+  const lines = await (await fetch('/api/log/' + id)).json()
+  const stick = el.scrollTop + el.clientHeight >= el.scrollHeight - 20
+  el.textContent = lines.join('\n'); if (stick) el.scrollTop = el.scrollHeight
+}
+load(); setInterval(load, 1500)
+</script>
+</body>
+</html>
