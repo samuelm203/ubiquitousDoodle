@@ -22,3 +22,15 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+.idea
+
+# Maven
+target/
+
+# Lokale H2-Datenbank der App
+data/
+
+# Von Vaadin generiert
+app-vaadin/src/main/frontend/generated/
+node_modules/
