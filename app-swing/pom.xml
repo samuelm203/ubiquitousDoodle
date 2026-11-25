@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.example.orders</groupId>
+        <artifactId>orders-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>app-swing</artifactId>
+    <name>Orders :: Swing Desktop App</name>
+    <description>Swing-Desktop-Oberflaeche (Swing-Tree) direkt auf dem framework-freien Backend, ohne Spring und ohne REST.</description>
+
+    <properties>
+        <swing-tree.version>1.1.2</swing-tree.version>
+        <sprouts.version>2.8.1</sprouts.version>
+        <miglayout.version>11.5.2</miglayout.version>
+        <jsvg.version>2.2.0</jsvg.version>
+        <jspecify.version>1.0.1</jspecify.version>
+        <slf4j.version>2.0.17</slf4j.version>
+        <flatlaf.version>3.8</flatlaf.version>
+        <exec-maven-plugin.version>3.5.0</exec-maven-plugin.version>
+        <maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
+        <app.main>com.example.orders.swing.SwingApp</app.main>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.example.orders</groupId>
+            <artifactId>backend-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.example.orders</groupId>
+            <artifactId>backend-persistence-inmemory</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.globaltcad</groupId>
+            <artifactId>swing-tree</artifactId>
+            <version>${swing-tree.version}</version>
+            <exclusions>
+                <exclusion><groupId>io.github.globaltcad</groupId><artifactId>sprouts</artifactId></exclusion>
+                <exclusion><groupId>com.miglayout</groupId><artifactId>miglayout-swing</artifactId></exclusion>
+                <exclusion><groupId>com.github.weisj</groupId><artifactId>jsvg</artifactId></exclusion>
+                <exclusion><groupId>org.jspecify</groupId><artifactId>jspecify</artifactId></exclusion>
+                <exclusion><groupId>org.slf4j</groupId><artifactId>slf4j-api</artifactId></exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Swing-Tree deklariert diese Abhaengigkeiten als Versionsbereiche; hier fest gepinnt (reproduzierbar). -->
+        <dependency>
+            <groupId>io.github.globaltcad</groupId>
+            <artifactId>sprouts</artifactId>
+            <version>${sprouts.version}</version>
+            <exclusions>
+                <exclusion><groupId>org.jspecify</groupId><artifactId>jspecify</artifactId></exclusion>
+                <exclusion><groupId>org.slf4j</groupId><artifactId>slf4j-api</artifactId></exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.miglayout</groupId>
+            <artifactId>miglayout-swing</artifactId>
+            <version>${miglayout.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.weisj</groupId>
+            <artifactId>jsvg</artifactId>
+            <version>${jsvg.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+            <version>${jspecify.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>${flatlaf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Start per: mvn -pl app-swing exec:java -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec-maven-plugin.version}</version>
+                <configuration>
+                    <mainClass>${app.main}</mainClass>
+                </configuration>
+            </plugin>
+            <!-- Ausfuehrbares Jar: java -jar app-swing/target/app-swing-1.0.0-SNAPSHOT-all.jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven-shade-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>all</shadedClassifierName>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>${app.main}</mainClass>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
+                                        <exclude>META-INF/versions/*/module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

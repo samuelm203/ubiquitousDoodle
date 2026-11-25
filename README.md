@@ -22,6 +22,8 @@ Zum Zurücksetzen löschst du diesen Ordner.
 
 Produktions-Build: `mvn -Pproduction package`, danach `java -jar app-vaadin/target/app-vaadin-1.0.0-SNAPSHOT.jar`.
 
+Swing-Desktop-App ohne Spring und REST direkt auf dem Backend: siehe `app-swing/README.md`.
+
 ## Architektur
 
 ```
