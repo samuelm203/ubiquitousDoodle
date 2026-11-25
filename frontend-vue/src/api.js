@@ -74,4 +74,16 @@ export const api = {
     ship: (id) => request('POST', `/orders/${id}/ship`),
     cancel: (id) => request('POST', `/orders/${id}/cancel`),
   },
+
+  // nur ADMIN
+  properties: {
+    companies: () => request('GET', '/properties/companies'),
+    table: (company, { filter = '', onlyDifferences = false, page = 0, size = 100 } = {}) => {
+      const q = new URLSearchParams({ page, size })
+      if (filter) q.set('filter', filter)
+      if (onlyDifferences) q.set('onlyDifferences', 'true')
+      return request('GET', `/properties/${encodeURIComponent(company)}?${q}`)
+    },
+    change: (company, changes) => request('PUT', `/properties/${encodeURIComponent(company)}`, { changes }),
+  },
 }

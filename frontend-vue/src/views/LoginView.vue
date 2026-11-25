@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '../api.js'
-import { setCredentials, logout } from '../auth.js'
+import { setCredentials, setAdmin, logout } from '../auth.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -18,6 +18,8 @@ async function submit() {
   try {
     // HTTP Basic hat kein Login-Endpoint: ein geschützter GET prüft die Zugangsdaten
     await api.dashboard()
+    // Rolle erkennen: Firmenkonfiguration ist nur für ADMIN lesbar (sonst 403)
+    setAdmin(await api.properties.companies().then(() => true, (e) => (e.status === 401 ? Promise.reject(e) : false)))
     router.replace(typeof route.query.redirect === 'string' ? route.query.redirect : '/')
   } catch (e) {
     logout()
