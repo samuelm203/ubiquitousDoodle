@@ -85,6 +85,25 @@ curl -u user:user -H 'Content-Type: application/json' -d '{"productId":"<id>","q
 curl -u user:user -X POST localhost:8080/api/orders/<id>/place     # bzw. /ship, /cancel
 ```
 
+### Firmenkonfiguration (.properties), nur ADMIN
+
+5 Firmen mit je 4 `.properties`-Dateien (dev/prod/staging/test, je ca. 1000 Schlüssel). Die Dateien liegen unter
+`app.properties.root` (Standard `./data/properties/<firma>/<spalte>.properties`). Beim ersten Start entstehen Beispieldateien.
+Die API liefert sie als Tabelle: eine Zeile pro Schlüssel, eine Spalte pro Datei, `null` = Schlüssel fehlt in dieser Datei.
+Schon das Lesen ist ADMIN vorbehalten, weil Konfigurationswerte Geheimnisse enthalten können.
+
+```bash
+curl -u admin:admin localhost:8080/api/properties/companies
+curl -u admin:admin 'localhost:8080/api/properties/seeland-bau?size=2000'                 # alle Zeilen
+curl -u admin:admin 'localhost:8080/api/properties/seeland-bau?filter=timeout&onlyDifferences=true&page=0&size=100'
+curl -u admin:admin -X PUT -H 'Content-Type: application/json' localhost:8080/api/properties/seeland-bau \
+  -d '{"changes":[{"column":"prod","key":"service.s001.timeout-ms","value":"4242"},{"column":"dev","key":"alt.key","value":null}]}'
+```
+
+`PUT` nimmt mehrere Änderungen auf einmal (alles oder nichts). `value: null` löscht den Schlüssel, ein neuer Schlüssel wird
+angehängt. Beim Schreiben bleiben Kommentare, Leerzeilen und Reihenfolge der Datei erhalten; geschrieben wird über eine
+temporäre Datei. Es gibt keine Versionsprüfung: Wer die Datei gleichzeitig von Hand ändert, kann Änderungen überschreiben.
+
 ## Mit einem anderen Framework ausprobieren
 
 Neues Modul anlegen, z. B. `app-quarkus`, `app-micronaut`, `app-javalin` oder `app-helidon`.
