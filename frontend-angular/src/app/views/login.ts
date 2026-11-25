@@ -57,6 +57,8 @@ export class Login {
     try {
       // HTTP Basic hat kein Login-Endpoint: ein geschützter GET prüft die Zugangsdaten
       await this.api.dashboard();
+      // 403 = kein Admin (Firmenkonfiguration bleibt ausgeblendet); andere Fehler gelten ebenfalls als "nicht Admin"
+      this.auth.setAdmin(await this.api.properties.companies().then(() => true, () => false));
       await this.router.navigateByUrl(this.redirect() || '/', { replaceUrl: true });
     } catch (e) {
       this.auth.logout();
