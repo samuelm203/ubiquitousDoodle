@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:c="jakarta.tags.core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/template.xhtml">
+    <ui:define name="title">Konfiguration</ui:define>
+    <ui:define name="content">
+        <h:panelGroup rendered="#{!propertiesBean.allowed}">
+            <div class="page-head"><h1>Konfiguration</h1></div>
+            <p class="muted">Nur für die Rolle ADMIN.</p>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{propertiesBean.allowed}">
+            <h:form id="ctl">
+                <div class="page-head">
+                    <h1>Konfiguration</h1>
+                    <div class="toolbar">
+                        <p:selectOneMenu id="company" value="#{propertiesBean.company}" style="min-width: 220px">
+                            <f:selectItems value="#{propertiesBean.companies}" var="co" itemValue="#{co.code}"
+                                           itemLabel="#{co.code} (#{co.keyCount} Schlüssel)"/>
+                            <p:ajax listener="#{propertiesBean.companyChanged}" update=":tbl"/>
+                        </p:selectOneMenu>
+                        <p:inputText id="filter" value="#{propertiesBean.filter}" placeholder="Schlüssel oder Wert …">
+                            <p:ajax event="keyup" delay="400" listener="#{propertiesBean.reload}" update=":tbl"/>
+                        </p:inputText>
+                        <p:selectBooleanCheckbox value="#{propertiesBean.onlyDifferences}" itemLabel="nur Unterschiede">
+                            <p:ajax listener="#{propertiesBean.reload}" update=":tbl"/>
+                        </p:selectBooleanCheckbox>
+                        <p:selectOneMenu value="#{propertiesBean.size}">
+                            <f:selectItem itemValue="50" itemLabel="50 / Seite"/>
+                            <f:selectItem itemValue="100" itemLabel="100 / Seite"/>
+                            <f:selectItem itemValue="250" itemLabel="250 / Seite"/>
+                            <p:ajax listener="#{propertiesBean.reload}" update=":tbl"/>
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+            </h:form>
+
+            <h:form id="tbl">
+                <div class="pager">
+                    <p:commandButton icon="pi pi-chevron-left" action="#{propertiesBean.prev}" update="@form"
+                                     process="@this" disabled="#{!propertiesBean.hasPrev}" title="Zurück"/>
+                    <span>Seite #{propertiesBean.page + 1} / #{propertiesBean.pageCount} · #{propertiesBean.total} Zeilen</span>
+                    <p:commandButton icon="pi pi-chevron-right" action="#{propertiesBean.next}" update="@form"
+                                     process="@this" disabled="#{!propertiesBean.hasNext}" title="Weiter"/>
+                    <span style="margin-left: auto"/>
+                    <h:outputText id="pend" styleClass="muted" value="#{propertiesBean.pendingCount} ungespeicherte Änderungen"/>
+                    <p:commandButton value="Verwerfen" styleClass="ui-button-secondary" action="#{propertiesBean.discard}"
+                                     update="@form" process="@this"/>
+                    <p:commandButton value="Alle speichern" icon="pi pi-save" action="#{propertiesBean.save}"
+                                     update="@form :growl" process="@this"/>
+                </div>
+
+                <p:dataTable id="table" value="#{propertiesBean.rows}" var="row" styleClass="cfg-table"
+                             emptyMessage="Keine Schlüssel gefunden">
+                    <p:column headerText="Schlüssel" styleClass="cfg-key">#{row.key}</p:column>
+                    <c:forEach items="#{propertiesBean.columns}" var="col" varStatus="st">
+                        <p:column headerText="#{col}">
+                            <p:inputText value="#{row.values[st.index]}" placeholder="(fehlt)"
+                                         styleClass="#{row.changed(st.index) ? 'cfg-changed' : ''}">
+                                <p:ajax event="change" process="@this" listener="#{propertiesBean.cellChanged(row)}"
+                                        update="@this :tbl:pend"/>
+                            </p:inputText>
+                        </p:column>
+                    </c:forEach>
+                </p:dataTable>
+            </h:form>
+        </h:panelGroup>
+    </ui:define>
+</ui:composition>
+</html>

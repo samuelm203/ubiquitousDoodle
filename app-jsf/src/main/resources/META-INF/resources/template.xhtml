@@ -13,11 +13,17 @@
 <h:body>
     <h:form id="nav">
         <p:menubar>
-            <f:facet name="options"><span class="muted">JSF · PrimeFaces · Quarkus</span></f:facet>
+            <f:facet name="options">
+                <span class="muted">JSF · PrimeFaces · Quarkus</span>
+                <p:commandButton value="Rolle: #{roleBean.role}" icon="pi pi-user" ajax="false"
+                                 action="#{roleBean.toggle}" styleClass="ui-button-flat ui-button-secondary"
+                                 title="Demo: Rolle wechseln (USER/ADMIN)"/>
+            </f:facet>
             <p:menuitem value="Übersicht" outcome="/dashboard" icon="pi pi-th-large"/>
             <p:menuitem value="Bestellungen" outcome="/orders" icon="pi pi-list"/>
             <p:menuitem value="Kunden" outcome="/customers" icon="pi pi-users"/>
             <p:menuitem value="Produkte" outcome="/products" icon="pi pi-box"/>
+            <p:menuitem value="Konfiguration" outcome="/properties" icon="pi pi-cog" rendered="#{roleBean.admin}"/>
         </p:menubar>
     </h:form>
     <p:growl id="growl" showDetail="false" life="4000" sticky="false"/>

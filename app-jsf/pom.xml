@@ -43,6 +43,10 @@
             <groupId>com.example.orders</groupId>
             <artifactId>backend-persistence-inmemory</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.example.orders</groupId>
+            <artifactId>backend-persistence-files</artifactId>
+        </dependency>
         <!-- bringt MyFaces (myfaces-quarkus), PrimeFaces und Undertow mit -->
         <dependency>
             <groupId>io.quarkiverse.primefaces</groupId>
