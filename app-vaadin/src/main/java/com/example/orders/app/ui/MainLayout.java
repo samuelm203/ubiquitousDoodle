@@ -41,6 +41,7 @@ public class MainLayout extends AppLayout {
         nav.addItem(new SideNavItem("Kunden", CustomersView.class, VaadinIcon.USERS.create()));
         if (auth.hasRole("ADMIN")) {
             nav.addItem(new SideNavItem("Produkte", ProductsView.class, VaadinIcon.PACKAGE.create()));
+            nav.addItem(new SideNavItem("Konfiguration", PropertiesView.class, VaadinIcon.COG.create()));
         }
         addToDrawer(nav);
     }
