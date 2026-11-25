@@ -50,6 +50,10 @@
             <groupId>com.example.orders</groupId>
             <artifactId>backend-persistence-jpa</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.example.orders</groupId>
+            <artifactId>backend-persistence-files</artifactId>
+        </dependency>
 
         <!-- Laufzeit -->
         <dependency>

@@ -25,6 +25,8 @@ public class SecurityConfig {
     SecurityFilterChain apiSecurity(HttpSecurity http) throws Exception {
         http.securityMatcher("/api/**")
                 .authorizeHttpRequests(auth -> auth
+                        // Konfigurationswerte können Geheimnisse enthalten: schon Lesen nur für ADMIN (steht vor der GET-Regel)
+                        .requestMatchers("/api/properties/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/**").authenticated()
                         .requestMatchers("/api/products/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
