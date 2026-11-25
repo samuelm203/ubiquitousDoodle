@@ -134,3 +134,14 @@ tr.inactive td { color: var(--muted); }
 .toast { padding: 10px 16px; border-radius: 8px; color: #fff; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18); max-width: 380px; }
 .toast-success { background: var(--success); }
 .toast-error { background: var(--danger); }
+
+/* Konfiguration */
+.props td, .props th { padding: 4px 8px; }
+.props td.key { font-family: ui-monospace, monospace; font-size: 0.85rem; word-break: break-all; min-width: 220px; }
+.props .cell { display: flex; gap: 2px; align-items: center; }
+.props .cell input { width: 100%; min-width: 110px; padding: 4px 8px; }
+.props .cell.missing input { border-style: dashed; }
+.props .cell.dirty input { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 8%, transparent); }
+.props .cell.deleted input { border-color: var(--danger); text-decoration: line-through; }
+.props tr.diff td.key { font-weight: 600; }
+.pager { display: flex; gap: 10px; align-items: center; justify-content: flex-end; padding: 10px 14px; }
