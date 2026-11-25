@@ -8,12 +8,14 @@ const route = useRoute()
 const router = useRouter()
 const showShell = computed(() => !route.meta.public)
 
-const nav = [
+const allNav = [
   { to: '/', label: 'Übersicht', icon: '◧' },
   { to: '/orders', label: 'Bestellungen', icon: '▤' },
   { to: '/customers', label: 'Kunden', icon: '◎' },
   { to: '/products', label: 'Produkte', icon: '▣' },
+  { to: '/properties', label: 'Konfiguration', icon: '⚙', admin: true },
 ]
+const nav = computed(() => allNav.filter((i) => !i.admin || auth.admin))
 
 function isActive(to) {
   return to === '/' ? route.path === '/' : route.path.startsWith(to)

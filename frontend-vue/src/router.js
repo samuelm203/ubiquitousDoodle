@@ -9,6 +9,7 @@ export const router = createRouter({
     { path: '/orders/:id?', name: 'orders', component: () => import('./views/OrdersView.vue'), meta: { title: 'Bestellungen' } },
     { path: '/customers', name: 'customers', component: () => import('./views/CustomersView.vue'), meta: { title: 'Kunden' } },
     { path: '/products', name: 'products', component: () => import('./views/ProductsView.vue'), meta: { title: 'Produkte' } },
+    { path: '/properties', name: 'properties', component: () => import('./views/PropertiesView.vue'), meta: { title: 'Konfiguration', admin: true } },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })
@@ -17,6 +18,7 @@ router.beforeEach((to) => {
   if (!to.meta.public && !auth.loggedIn) {
     return { name: 'login', query: to.fullPath !== '/' ? { redirect: to.fullPath } : {} }
   }
+  if (to.meta.admin && !auth.admin) return { name: 'dashboard' }
   if (to.name === 'login' && auth.loggedIn) return { name: 'dashboard' }
 })
 
