@@ -15,9 +15,11 @@
         <module>backend-core</module>
         <module>backend-persistence-inmemory</module>
         <module>backend-persistence-jpa</module>
+        <module>backend-persistence-files</module>
         <module>app-vaadin</module>
         <module>app-swing</module>
         <module>app-javafx</module>
+        <module>app-jsf</module>
     </modules>
 
     <properties>
@@ -45,6 +47,11 @@
             <dependency>
                 <groupId>com.example.orders</groupId>
                 <artifactId>backend-persistence-jpa</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example.orders</groupId>
+                <artifactId>backend-persistence-files</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

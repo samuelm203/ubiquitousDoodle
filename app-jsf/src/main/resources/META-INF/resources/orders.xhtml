@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/template.xhtml">
+    <ui:define name="title">Bestellungen</ui:define>
+    <ui:define name="metadata">
+        <f:viewParam name="id" value="#{ordersBean.selectedId}"/>
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="main">
+            <div class="page-head">
+                <h1>Bestellungen</h1>
+                <div class="toolbar">
+                    <p:selectOneMenu id="newCustomer" value="#{ordersBean.newCustomerId}" style="min-width: 200px">
+                        <f:selectItem itemLabel="Kunde wählen …" itemValue="" noSelectionOption="true"/>
+                        <f:selectItems value="#{ordersBean.activeCustomers}" var="c" itemValue="#{c.id}" itemLabel="#{c.name}"/>
+                    </p:selectOneMenu>
+                    <p:commandButton id="createOrder" value="+ Neue Bestellung" icon="pi pi-plus" action="#{ordersBean.createOrder}"
+                                     update=":main:body :growl" process="@form"/>
+                </div>
+            </div>
+
+            <p:outputPanel id="body" styleClass="layout #{ordersBean.current != null ? 'with-detail' : ''}">
+                <p:card>
+                    <div class="toolbar" style="margin-bottom: 12px">
+                        <p:selectOneButton value="#{ordersBean.statusFilter}">
+                            <p:ajax update="table"/>
+                            <f:selectItem itemLabel="Alle" itemValue=""/>
+                            <f:selectItem itemLabel="Entwurf" itemValue="DRAFT"/>
+                            <f:selectItem itemLabel="Aufgegeben" itemValue="PLACED"/>
+                            <f:selectItem itemLabel="Versendet" itemValue="SHIPPED"/>
+                            <f:selectItem itemLabel="Storniert" itemValue="CANCELLED"/>
+                        </p:selectOneButton>
+                    </div>
+                    <p:dataTable id="table" value="#{ordersBean.visible}" var="o" emptyMessage="Keine Bestellungen"
+                                 rowStyleClass="#{o.id == ordersBean.selectedId ? 'ui-state-highlight' : ''}">
+                        <p:column headerText="Nr."><code>#{o.number}</code></p:column>
+                        <p:column headerText="Kunde">#{o.customerName}</p:column>
+                        <p:column headerText="Status">
+                            <span class="badge badge-#{fmt.statusTone(o.status)}">#{fmt.status(o.status)}</span>
+                        </p:column>
+                        <p:column headerText="Erfasst"><span class="muted">#{fmt.dateTime(o.createdAt)}</span></p:column>
+                        <p:column headerText="Total" styleClass="num">#{fmt.money(o.total, o.currency)}</p:column>
+                        <p:column width="60">
+                            <p:commandButton icon="pi pi-eye" title="Öffnen" styleClass="rounded-button ui-button-flat"
+                                             action="#{ordersBean.select(o.id)}" update=":main:body" process="@this"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:card>
+
+                <p:card id="detail" rendered="#{ordersBean.current != null}">
+                    <f:facet name="title">Bestellung #{ordersBean.current.number}</f:facet>
+                    <f:facet name="subtitle">#{ordersBean.current.customerName}</f:facet>
+
+                    <p>
+                        <span class="badge badge-#{fmt.statusTone(ordersBean.current.status)}">#{fmt.status(ordersBean.current.status)}</span>
+                        <span class="muted"> · erfasst #{fmt.dateTime(ordersBean.current.createdAt)}</span>
+                        <h:outputText styleClass="muted" rendered="#{ordersBean.current.placedAt != null}"
+                                      value=" · aufgegeben #{fmt.dateTime(ordersBean.current.placedAt)}"/>
+                    </p>
+
+                    <p:dataTable id="lines" value="#{ordersBean.current.lines}" var="l" emptyMessage="Noch keine Positionen">
+                        <p:column headerText="Produkt">#{l.productName}</p:column>
+                        <p:column headerText="Menge" styleClass="num">#{l.quantity}</p:column>
+                        <p:column headerText="Preis" styleClass="num">#{fmt.money(l.unitPrice, ordersBean.current.currency)}</p:column>
+                        <p:column headerText="Total" styleClass="num">#{fmt.money(l.lineTotal, ordersBean.current.currency)}</p:column>
+                        <p:column width="50" rendered="#{ordersBean.draft}">
+                            <p:commandButton icon="pi pi-trash" title="Position entfernen" severity="danger"
+                                             styleClass="rounded-button ui-button-flat"
+                                             action="#{ordersBean.removeLine(l.productId)}"
+                                             update=":main:body :growl" process="@this"/>
+                        </p:column>
+                        <f:facet name="footer">
+                            <div class="num">Total: <strong>#{fmt.money(ordersBean.current.total, ordersBean.current.currency)}</strong></div>
+                        </f:facet>
+                    </p:dataTable>
+
+                    <p:outputPanel rendered="#{ordersBean.draft}" styleClass="add-line">
+                        <p:selectOneMenu id="lineProduct" value="#{ordersBean.lineProductId}" style="flex: 1; min-width: 180px">
+                            <f:selectItem itemLabel="Produkt wählen …" itemValue="" noSelectionOption="true"/>
+                            <f:selectItems value="#{ordersBean.activeProducts}" var="pr" itemValue="#{pr.id}"
+                                           itemLabel="#{pr.name} (#{fmt.money(pr.price, pr.currency)})"/>
+                        </p:selectOneMenu>
+                        <p:spinner id="lineQty" value="#{ordersBean.lineQuantity}" min="1" size="3"/>
+                        <p:commandButton id="addLine" value="Hinzufügen" action="#{ordersBean.addLine}"
+                                         update=":main:body :growl" process="lineProduct lineQty @this"/>
+                    </p:outputPanel>
+
+                    <div class="actions">
+                        <p:commandButton id="place" value="Aufgeben" icon="pi pi-check" rendered="#{ordersBean.draft}"
+                                         action="#{ordersBean.place}" update=":main:body :growl" process="@this"/>
+                        <p:commandButton id="ship" value="Versenden" icon="pi pi-send" rendered="#{ordersBean.placed}"
+                                         action="#{ordersBean.ship}" update=":main:body :growl" process="@this"/>
+                        <p:commandButton id="cancel" value="Stornieren" severity="danger" styleClass="ui-button-outlined"
+                                         rendered="#{ordersBean.draft or ordersBean.placed}"
+                                         action="#{ordersBean.cancel}" update=":main:body :growl" process="@this">
+                            <p:confirm header="Stornieren" message="Bestellung wirklich stornieren?" icon="pi pi-exclamation-triangle"/>
+                        </p:commandButton>
+                        <p:commandButton value="Schliessen" styleClass="ui-button-secondary" action="#{ordersBean.close}"
+                                         update=":main:body" process="@this" style="margin-left: auto"/>
+                    </div>
+                </p:card>
+            </p:outputPanel>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes"/>
+                <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"/>
+            </p:confirmDialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>

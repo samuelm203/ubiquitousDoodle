@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/template.xhtml">
+    <ui:define name="title">Kunden</ui:define>
+    <ui:define name="content">
+        <h:form id="list">
+            <div class="page-head">
+                <h1>Kunden</h1>
+                <div class="toolbar">
+                    <p:inputText id="filter" value="#{customersBean.filter}" placeholder="Suchen …">
+                        <p:ajax event="keyup" delay="300" update="table"/>
+                    </p:inputText>
+                    <p:commandButton value="+ Neuer Kunde" icon="pi pi-plus" action="#{customersBean.newCustomer}"
+                                     update=":dlg:form" oncomplete="PF('customerDialog').show()" process="@this"/>
+                </div>
+            </div>
+
+            <p:dataTable id="table" value="#{customersBean.visible}" var="c" emptyMessage="Keine Kunden gefunden"
+                         rowStyleClass="#{c.active ? '' : 'inactive'}">
+                <p:column headerText="Name"><strong>#{c.name}</strong></p:column>
+                <p:column headerText="E-Mail">#{c.email}</p:column>
+                <p:column headerText="Ort">#{c.city}</p:column>
+                <p:column headerText="Status">
+                    <span class="badge badge-#{c.active ? 'success' : 'neutral'}">#{c.active ? 'Aktiv' : 'Inaktiv'}</span>
+                </p:column>
+                <p:column width="60">
+                    <p:commandButton icon="pi pi-pencil" title="Bearbeiten" styleClass="rounded-button ui-button-flat"
+                                     action="#{customersBean.edit(c)}" update=":dlg:form"
+                                     oncomplete="PF('customerDialog').show()" process="@this"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <h:form id="dlg">
+            <p:dialog header="Kunde" widgetVar="customerDialog" modal="true" resizable="false" width="440">
+                <p:outputPanel id="form">
+                    <div class="ui-fluid" style="display: grid; gap: 12px">
+                        <p:outputLabel for="name" value="Name"/>
+                        <p:inputText id="name" value="#{customersBean.name}"/>
+                        <p:outputLabel for="email" value="E-Mail"/>
+                        <p:inputText id="email" value="#{customersBean.email}"/>
+                        <p:outputLabel for="city" value="Ort"/>
+                        <p:inputText id="city" value="#{customersBean.city}"/>
+                        <p:selectBooleanCheckbox id="active" value="#{customersBean.active}" itemLabel="Aktiv"/>
+                    </div>
+                    <div class="actions">
+                        <p:commandButton value="Löschen" severity="danger" styleClass="ui-button-outlined"
+                                         rendered="#{customersBean.id != null}" action="#{customersBean.delete}"
+                                         update=":growl :list:table" process="@this"
+                                         style="margin-right: auto">
+                            <p:confirm header="Löschen" message="Kunde wirklich löschen?" icon="pi pi-exclamation-triangle"/>
+                        </p:commandButton>
+                        <p:commandButton value="Abbrechen" type="button" styleClass="ui-button-secondary"
+                                         onclick="PF('customerDialog').hide()"/>
+                        <p:commandButton value="Speichern" action="#{customersBean.save}"
+                                         update=":growl :list:table" process=":dlg:form @this"/>
+                    </div>
+                </p:outputPanel>
+            </p:dialog>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes"/>
+                <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"/>
+            </p:confirmDialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>

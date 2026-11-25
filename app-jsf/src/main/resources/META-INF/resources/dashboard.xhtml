@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/template.xhtml">
+    <ui:define name="title">Übersicht</ui:define>
+    <ui:define name="content">
+        <div class="page-head"><h1>Übersicht</h1></div>
+        <p class="muted">Framework: Jakarta Faces (JSF) + PrimeFaces</p>
+
+        <div class="tiles">
+            <div class="tile"><span class="muted">Umsatz (aufgegeben + versendet)</span>
+                <strong>#{fmt.money(dashboardBean.data.revenue, dashboardBean.data.currency)}</strong></div>
+            <div class="tile"><span class="muted">Offene Bestellungen</span>
+                <strong>#{dashboardBean.count('PLACED')}</strong></div>
+            <div class="tile"><span class="muted">Kunden</span>
+                <strong>#{dashboardBean.data.customers}</strong></div>
+            <div class="tile"><span class="muted">Produkte</span>
+                <strong>#{dashboardBean.data.products}</strong></div>
+        </div>
+
+        <div class="grid2">
+            <p:card>
+                <f:facet name="title">Bestellungen nach Status</f:facet>
+                <ul class="bars">
+                    <ui:repeat value="#{dashboardBean.statuses}" var="s">
+                        <li>
+                            <span class="badge badge-#{fmt.statusTone(s)}">#{fmt.status(s)}</span>
+                            <div class="bar"><div class="bar-fill fill-#{fmt.statusTone(s)}" style="width: #{dashboardBean.percent(s)}%"></div></div>
+                            <span class="num">#{dashboardBean.count(s)}</span>
+                        </li>
+                    </ui:repeat>
+                </ul>
+            </p:card>
+
+            <p:card>
+                <f:facet name="title">Neueste Bestellungen</f:facet>
+                <p:dataTable id="recent" value="#{dashboardBean.recent}" var="o" emptyMessage="Noch keine Bestellungen">
+                    <p:column headerText="Bestellung">
+                        <h:link outcome="/orders" value="#{o.number}"><f:param name="id" value="#{o.id}"/></h:link>
+                        <br/><span class="muted">#{o.customerName}</span>
+                    </p:column>
+                    <p:column headerText="Status">
+                        <span class="badge badge-#{fmt.statusTone(o.status)}">#{fmt.status(o.status)}</span>
+                    </p:column>
+                    <p:column headerText="Total" styleClass="num">#{fmt.money(o.total, o.currency)}</p:column>
+                </p:dataTable>
+                <h:link outcome="/orders" value="Alle anzeigen →"/>
+            </p:card>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

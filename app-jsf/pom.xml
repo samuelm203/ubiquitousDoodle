@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.example.orders</groupId>
+        <artifactId>orders-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>app-jsf</artifactId>
+    <name>Orders :: App (JSF + PrimeFaces on Quarkus)</name>
+    <description>
+        Web-UI mit JSF (Apache MyFaces) und PrimeFaces auf Quarkus statt Spring. Die Beans rufen nur die
+        framework-freien Controller aus backend-core auf (In-Memory-Persistenz).
+    </description>
+
+    <properties>
+        <!-- Die Quarkiverse-Extension quarkus-primefaces 4.16.x ist gegen Quarkus 3.33 gebaut -->
+        <quarkus.version>3.33.4</quarkus.version>
+        <quarkus-primefaces.version>4.16.2</quarkus-primefaces.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-bom</artifactId>
+                <version>${quarkus.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.example.orders</groupId>
+            <artifactId>backend-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.example.orders</groupId>
+            <artifactId>backend-persistence-inmemory</artifactId>
+        </dependency>
+        <!-- bringt MyFaces (myfaces-quarkus), PrimeFaces und Undertow mit -->
+        <dependency>
+            <groupId>io.quarkiverse.primefaces</groupId>
+            <artifactId>quarkus-primefaces</artifactId>
+            <version>${quarkus-primefaces.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <version>${quarkus.version}</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>generate-code</goal>
+                            <goal>generate-code-tests</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

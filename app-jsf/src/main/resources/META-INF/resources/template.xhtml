@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+<f:metadata><ui:insert name="metadata"/></f:metadata>
+<h:head>
+    <title><ui:insert name="title">Orders</ui:insert> · Orders (JSF)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="app.css"/>
+</h:head>
+<h:body>
+    <h:form id="nav">
+        <p:menubar>
+            <f:facet name="options"><span class="muted">JSF · PrimeFaces · Quarkus</span></f:facet>
+            <p:menuitem value="Übersicht" outcome="/dashboard" icon="pi pi-th-large"/>
+            <p:menuitem value="Bestellungen" outcome="/orders" icon="pi pi-list"/>
+            <p:menuitem value="Kunden" outcome="/customers" icon="pi pi-users"/>
+            <p:menuitem value="Produkte" outcome="/products" icon="pi pi-box"/>
+        </p:menubar>
+    </h:form>
+    <p:growl id="growl" showDetail="false" life="4000" sticky="false"/>
+    <div class="content">
+        <ui:insert name="content"/>
+    </div>
+</h:body>
+</html>
