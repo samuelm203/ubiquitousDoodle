@@ -22,7 +22,9 @@ Swing-Panels  ->  Controller (backend-core)  ->  Services  ->  Model / Repositor
 Wie die Vaadin-UI: Dashboard, Kunden (suchen, anlegen, bearbeiten, löschen), Produkte (anlegen, bearbeiten),
 Bestellungen (anlegen, Positionen hinzufügen/entfernen, aufgeben, versenden, stornieren). Beim Tabwechsel wird das Panel neu geladen.
 
-Der Löschen-Button bei Kunden fragt vorher nach. Es gibt keine Anmeldung und keine Rollen.
+Der Löschen-Button bei Kunden fragt vorher nach. Es gibt keine Anmeldung; die Rolle kommt aus `-Dorders.role=ADMIN` (Standard USER).
+
+**Konfiguration (nur ADMIN):** Mit `-Dorders.role=ADMIN` erscheint der Tab «Konfiguration» (Firmenauswahl, Filter, «Nur Unterschiede», Paging mit 100 Zeilen, Zellen bearbeiten, «Löschen (null)», gesammeltes «Speichern» alles-oder-nichts). Dateien unter `-Dapp.properties.root` (Standard `./data/properties`, Demo-Daten beim ersten Start). Start: `mvn -pl app-swing exec:java -Dorders.role=ADMIN`.
 
 ## Starten
 
