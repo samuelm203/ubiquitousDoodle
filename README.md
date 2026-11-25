@@ -58,6 +58,9 @@ Fehler:
 - `DomainException`: fachlicher Fehler, wird zur Notification in der UI bzw. zu HTTP 422 (Problem Details).
 - `NotFoundException`: wird zu HTTP 404.
 
+Alternatives Frontend in Vue.js (gegen die REST-API): siehe [`frontend-vue/README.md`](frontend-vue/README.md),
+Start mit `cd frontend-vue && npm install && npm run dev` (http://localhost:5173).
+
 ## REST-API (HTTP Basic)
 
 ```bash
