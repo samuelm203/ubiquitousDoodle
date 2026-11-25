@@ -61,6 +61,9 @@ Fehler:
 Alternatives Frontend in Vue.js (gegen die REST-API): siehe [`frontend-vue/README.md`](frontend-vue/README.md),
 Start mit `cd frontend-vue && npm install && npm run dev` (http://localhost:5173).
 
+Alternatives Frontend in Angular: siehe [`frontend-angular/README.md`](frontend-angular/README.md),
+Start mit `cd frontend-angular && npm install && npm start` (http://localhost:4200).
+
 Alternatives Frontend in React (ebenfalls gegen die REST-API): siehe [`frontend-react/README.md`](frontend-react/README.md),
 Start mit `cd frontend-react && npm install && npm run dev` (http://localhost:5174).
 
