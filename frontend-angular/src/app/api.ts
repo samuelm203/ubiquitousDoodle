@@ -63,6 +63,30 @@ export interface Order {
   lines: OrderLine[];
 }
 
+export interface Company {
+  code: string;
+  columns: string[];
+  keyCount: number;
+}
+/** values ist wie columns sortiert; null = Schlüssel fehlt in dieser Spalte. */
+export interface PropertyRow {
+  key: string;
+  values: (string | null)[];
+}
+export interface PropertyTable {
+  company: string;
+  columns: string[];
+  rows: PropertyRow[];
+  total: number;
+  page: number;
+  size: number;
+}
+export interface PropertyChange {
+  column: string;
+  key: string;
+  value: string | null;
+}
+
 /**
  * Hängt Auth- und Marker-Header an jede /api-Anfrage und übersetzt Fehler in ApiError.
  * Bei 401 wird abgemeldet und zum Login geleitet.
@@ -120,6 +144,18 @@ export class Api {
     list: () => this.get<Product[]>('/products'),
     create: (form: ProductForm) => this.post<Product>('/products', form),
     update: (id: string, form: ProductForm) => this.put<Product>(`/products/${id}`, form),
+  };
+
+  properties = {
+    companies: () => this.get<Company[]>('/properties/companies'),
+    table: (company: string, q: { filter: string; onlyDifferences: boolean; page: number; size: number }) => {
+      const p = new URLSearchParams({ page: String(q.page), size: String(q.size) });
+      if (q.filter) p.set('filter', q.filter);
+      if (q.onlyDifferences) p.set('onlyDifferences', 'true');
+      return this.get<PropertyTable>(`/properties/${encodeURIComponent(company)}?${p}`);
+    },
+    change: (company: string, changes: PropertyChange[]) =>
+      this.put<{ applied: number }>(`/properties/${encodeURIComponent(company)}`, { changes }),
   };
 
   orders = {

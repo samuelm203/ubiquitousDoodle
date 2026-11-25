@@ -11,6 +11,8 @@ const requireLogin: CanActivateFn = (_route, state) => {
   });
 };
 
+const requireAdmin: CanActivateFn = () => (inject(Auth).admin() ? true : inject(Router).createUrlTree(['/']));
+
 const redirectIfLoggedIn: CanActivateFn = () => {
   const auth = inject(Auth);
   return auth.loggedIn() ? inject(Router).createUrlTree(['/']) : true;
@@ -38,6 +40,12 @@ export const routes: Routes = [
       { matcher: ordersMatcher, title: 'Bestellungen', loadComponent: () => import('./views/orders').then((m) => m.Orders) },
       { path: 'customers', title: 'Kunden', loadComponent: () => import('./views/customers').then((m) => m.Customers) },
       { path: 'products', title: 'Produkte', loadComponent: () => import('./views/products').then((m) => m.Products) },
+      {
+        path: 'properties',
+        title: 'Firmenkonfiguration',
+        canActivate: [requireAdmin],
+        loadComponent: () => import('./views/properties').then((m) => m.Properties),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

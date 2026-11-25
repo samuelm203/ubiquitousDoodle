@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Auth } from './auth';
 
@@ -10,7 +10,7 @@ import { Auth } from './auth';
       <aside class="sidebar">
         <div class="brand">Orders</div>
         <nav>
-          @for (item of nav; track item.to) {
+          @for (item of nav(); track item.to) {
             <a
               class="nav-link"
               [routerLink]="item.to"
@@ -36,12 +36,14 @@ export class Shell {
   protected readonly auth = inject(Auth);
   private readonly router = inject(Router);
 
-  protected readonly nav = [
-    { to: '/', label: 'Übersicht', icon: '◧' },
+  private readonly items = [
+    { to: '/', label: 'Übersicht', icon: '◧', admin: false },
     { to: '/orders', label: 'Bestellungen', icon: '▤' },
     { to: '/customers', label: 'Kunden', icon: '◎' },
     { to: '/products', label: 'Produkte', icon: '▣' },
+    { to: '/properties', label: 'Firmenkonfiguration', icon: '☰', admin: true },
   ];
+  protected readonly nav = computed(() => this.items.filter((i) => !i.admin || this.auth.admin()));
 
   protected signOut(): void {
     this.auth.logout();
