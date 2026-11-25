@@ -34,3 +34,6 @@ data/
 # Von Vaadin generiert
 app-vaadin/src/main/frontend/generated/
 node_modules/
+
+# Frontend-Build-Ausgabe
+dist/
