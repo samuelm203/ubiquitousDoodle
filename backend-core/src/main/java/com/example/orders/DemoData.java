@@ -1,39 +1,28 @@
-package com.example.orders.app.config;
+package com.example.orders;
 
-import com.example.orders.Backend;
 import com.example.orders.controller.dto.Dtos.AddLineRequest;
 import com.example.orders.controller.dto.Dtos.CreateOrderRequest;
 import com.example.orders.controller.dto.Dtos.CustomerDto;
 import com.example.orders.controller.dto.Dtos.CustomerForm;
 import com.example.orders.controller.dto.Dtos.ProductDto;
 import com.example.orders.controller.dto.Dtos.ProductForm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-/** Legt beim ersten Start Beispieldaten an, über dieselben Controller wie die Views. */
-@Component
-@ConditionalOnProperty(name = "app.demo-data", havingValue = "true")
-class DemoData implements ApplicationRunner {
+/**
+ * Beispieldaten für jede Laufzeit. Geht nur über die Controller, wie jede View.
+ * Jede App ruft {@code DemoData.seed(backend)} einmal beim Start auf.
+ */
+public final class DemoData {
 
-    private static final Logger log = LoggerFactory.getLogger(DemoData.class);
-
-    private final Backend backend;
-
-    DemoData(Backend backend) {
-        this.backend = backend;
+    private DemoData() {
     }
 
-    @Override
-    public void run(ApplicationArguments args) {
+    /** Legt Beispieldaten an, falls noch keine Kunden existieren. @return true, wenn Daten angelegt wurden. */
+    public static boolean seed(Backend backend) {
         if (!backend.customers.list().isEmpty()) {
-            return;
+            return false;
         }
         List<CustomerDto> c = List.of(
                 backend.customers.create(new CustomerForm("Helvetia Logistik AG", "einkauf@helvetia-logistik.example", "Basel", null)),
@@ -60,7 +49,6 @@ class DemoData implements ApplicationRunner {
 
         var o3 = backend.orders.create(new CreateOrderRequest(c.get(2).id()));
         backend.orders.addLine(o3.id(), new AddLineRequest(p.get(3).id(), 6));
-
-        log.info("Demo-Daten angelegt: {} Kunden, {} Produkte, 3 Bestellungen", c.size(), p.size());
+        return true;
     }
 }
