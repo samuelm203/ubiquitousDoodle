@@ -25,6 +25,7 @@ const totalOrders = computed(() => Object.keys(STATUS).reduce((sum, s) => sum + 
   <div class="page-head">
     <h1>Übersicht</h1>
   </div>
+  <p class="muted">Framework: Vue</p>
 
   <template v-if="data">
     <div class="tiles">

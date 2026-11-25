@@ -27,6 +27,7 @@ public class DashboardPanel extends JPanel implements Refreshable {
         UI.of(this)
                 .withLayout("insets 16, wrap 3, gap 12", "[grow, fill][grow, fill][grow, fill]", "[]12[][]")
                 .add("span 3", UI.label("Übersicht").withFontSize(22))
+                .add("span 3", UI.label("Framework: Swing (SwingTree)").withForeground(Color.GRAY))
                 .add(card("Umsatz", revenue))
                 .add(card("Offene Bestellungen", placed))
                 .add(card("Entwürfe", drafts))

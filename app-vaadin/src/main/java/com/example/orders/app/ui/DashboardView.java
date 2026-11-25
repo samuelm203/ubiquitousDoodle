@@ -32,7 +32,10 @@ public class DashboardView extends VerticalLayout {
         cards.setFlexWrap(FlexLayout.FlexWrap.WRAP);
         cards.getStyle().set("gap", "var(--lumo-space-m)");
 
-        add(new H2("Übersicht"), cards);
+        Span framework = new Span("Framework: Vaadin");
+        framework.getStyle().set("color", "var(--lumo-secondary-text-color)");
+
+        add(new H2("Übersicht"), framework, cards);
     }
 
     private static Component card(String label, String value) {

@@ -18,7 +18,10 @@ class DashboardTab extends Tab implements Refreshable {
         this.backend = backend;
         setClosable(false);
         cards.setPadding(new Insets(16));
-        setContent(cards);
+        Label framework = new Label("Framework: JavaFX");
+        framework.setStyle("-fx-text-fill: #666;");
+        framework.setPadding(new Insets(16, 16, 0, 16));
+        setContent(new VBox(framework, cards));
     }
 
     @Override

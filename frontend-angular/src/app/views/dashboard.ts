@@ -12,6 +12,7 @@ import { OrderStatus, STATUS_LIST, money, newestFirst } from '../format';
     <div class="page-head">
       <h1>Übersicht</h1>
     </div>
+    <p class="muted">Framework: Angular</p>
 
     @if (data(); as d) {
       <div class="tiles">

@@ -21,6 +21,7 @@
 </script>
 
 <div class="page-head"><h1>Übersicht</h1></div>
+<p class="muted">Framework: Svelte</p>
 
 {#if data}
   <div class="tiles">

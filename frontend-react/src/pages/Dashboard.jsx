@@ -19,6 +19,7 @@ export default function Dashboard() {
   return (
     <>
       <h2>Übersicht</h2>
+      <p class="muted">Framework: React</p>
       <div className="stats">
         <Stat label="Umsatz" value={formatMoney(d.revenue, d.currency)} />
         <Stat label="Offene Bestellungen" value={by.PLACED ?? 0} />
