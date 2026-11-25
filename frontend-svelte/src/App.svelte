@@ -8,13 +8,17 @@
   import Orders from './views/Orders.svelte'
   import Customers from './views/Customers.svelte'
   import Products from './views/Products.svelte'
+  import Properties from './views/Properties.svelte'
 
   const nav = [
     { to: '/', label: 'Übersicht', icon: '◧' },
     { to: '/orders', label: 'Bestellungen', icon: '▤' },
     { to: '/customers', label: 'Kunden', icon: '◎' },
     { to: '/products', label: 'Produkte', icon: '▣' },
+    { to: '/properties', label: 'Konfiguration', icon: '⚙', admin: true },
   ]
+  const navItems = $derived(nav.filter((i) => !i.admin || auth.admin))
+  const showProps = $derived(route.path === '/properties' && auth.admin)
 
   const loggedIn = $derived(auth.header !== null)
   const orderId = $derived(route.path.startsWith('/orders/') ? route.path.slice('/orders/'.length) : null)
@@ -41,7 +45,7 @@
   })
 
   $effect(() => {
-    const titles = { '/': 'Übersicht', '/customers': 'Kunden', '/products': 'Produkte' }
+    const titles = { '/': 'Übersicht', '/customers': 'Kunden', '/products': 'Produkte', '/properties': 'Konfiguration' }
     const t = route.path.startsWith('/orders') ? 'Bestellungen' : titles[route.path]
     document.title = t ? `${t} · Orders` : 'Orders'
   })
@@ -54,7 +58,7 @@
     <aside class="sidebar">
       <div class="brand">Orders</div>
       <nav>
-        {#each nav as item (item.to)}
+        {#each navItems as item (item.to)}
           <a href="#{item.to}" class="nav-link" class:active={isActive(item.to)}>
             <span class="nav-icon" aria-hidden="true">{item.icon}</span>{item.label}
           </a>
@@ -72,6 +76,8 @@
         <Customers />
       {:else if route.path === '/products'}
         <Products />
+      {:else if showProps}
+        <Properties />
       {:else}
         <Dashboard />
       {/if}

@@ -46,9 +46,20 @@ export const api = {
   async login(username, password) {
     const header = 'Basic ' + btoa(unescape(encodeURIComponent(`${username}:${password}`)))
     await request('GET', '/dashboard', undefined, header)
-    saveAuth(username, header)
+    // Rolle: die API liefert keine; die Firmenliste ist nur für ADMIN lesbar (403 = kein Admin)
+    const admin = await request('GET', '/properties/companies', undefined, header).then(() => true, () => false)
+    saveAuth(username, header, admin)
   },
   logout: clearAuth,
+
+  propertyCompanies: () => request('GET', '/properties/companies'),
+  propertyTable: (company, { filter, onlyDifferences, page, size }) => {
+    const q = new URLSearchParams({ page, size })
+    if (filter) q.set('filter', filter)
+    if (onlyDifferences) q.set('onlyDifferences', 'true')
+    return request('GET', `/properties/${encodeURIComponent(company)}?${q}`)
+  },
+  changeProperties: (company, changes) => request('PUT', `/properties/${encodeURIComponent(company)}`, { changes }),
 
   dashboard: () => request('GET', '/dashboard'),
 
