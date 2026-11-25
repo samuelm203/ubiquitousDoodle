@@ -16,6 +16,7 @@
         <module>backend-persistence-inmemory</module>
         <module>backend-persistence-jpa</module>
         <module>app-vaadin</module>
+        <module>app-javafx</module>
     </modules>
 
     <properties>

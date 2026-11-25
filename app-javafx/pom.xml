@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.example.orders</groupId>
+        <artifactId>orders-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>app-javafx</artifactId>
+    <name>Orders :: App (JavaFX)</name>
+    <description>
+        Desktop-Variante: JavaFX-Views rufen die framework-freien Controller aus backend-core direkt auf.
+        Kein Spring, kein REST - das Backend läuft im selben Prozess (In-Memory).
+    </description>
+
+    <properties>
+        <javafx.version>27.0.1</javafx.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.example.orders</groupId>
+            <artifactId>backend-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.example.orders</groupId>
+            <artifactId>backend-persistence-inmemory</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>com.example.orders.javafx.OrdersApp</mainClass>
+                    <options>
+                        <option>--enable-native-access=javafx.graphics</option>
+                    </options>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -67,6 +67,9 @@ Start mit `cd frontend-angular && npm install && npm start` (http://localhost:42
 Alternatives Frontend in React (ebenfalls gegen die REST-API): siehe [`frontend-react/README.md`](frontend-react/README.md),
 Start mit `cd frontend-react && npm install && npm run dev` (http://localhost:5174).
 
+Desktop-App in JavaFX (nutzt `backend-core` direkt, ohne Spring und REST): siehe [`app-javafx/README.md`](app-javafx/README.md),
+Start mit `mvn -f app-javafx/pom.xml javafx:run`.
+
 ## REST-API (HTTP Basic)
 
 ```bash
