@@ -7,6 +7,15 @@ export const useAuth = () => useContext(AuthContext)
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => loadAuth()?.username ?? null)
 
+  // Rolle ermitteln: Die Konfigurations-API ist nur für ADMIN lesbar (sonst 403)
+  const [isAdmin, setIsAdmin] = useState(false)
+  useEffect(() => {
+    let alive = true
+    setIsAdmin(false)
+    if (user) api.propertyCompanies().then(() => alive && setIsAdmin(true), () => {})
+    return () => { alive = false }
+  }, [user])
+
   const logout = useCallback(() => {
     clearAuth()
     setUser(null)
@@ -20,5 +29,5 @@ export function AuthProvider({ children }) {
     setUser(username)
   }, [])
 
-  return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, isAdmin, login, logout }}>{children}</AuthContext.Provider>
 }

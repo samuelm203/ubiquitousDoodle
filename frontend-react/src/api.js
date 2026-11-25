@@ -79,6 +79,14 @@ export const api = {
   createProduct: (f) => request('POST', '/products', f),
   updateProduct: (id, f) => request('PUT', `/products/${id}`, f),
 
+  propertyCompanies: () => request('GET', '/properties/companies'),
+  propertyTable: (company, { filter, onlyDifferences, page, size }) => {
+    const q = new URLSearchParams({ page, size, onlyDifferences })
+    if (filter) q.set('filter', filter)
+    return request('GET', `/properties/${encodeURIComponent(company)}?${q}`)
+  },
+  changeProperties: (company, changes) => request('PUT', `/properties/${encodeURIComponent(company)}`, { changes }),
+
   orders: () => request('GET', '/orders'),
   createOrder: (customerId) => request('POST', '/orders', { customerId }),
   addLine: (id, productId, quantity) => request('POST', `/orders/${id}/lines`, { productId, quantity }),
