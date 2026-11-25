@@ -5,9 +5,10 @@ import Dashboard from './pages/Dashboard.jsx'
 import Customers from './pages/Customers.jsx'
 import Products from './pages/Products.jsx'
 import Orders from './pages/Orders.jsx'
+import Properties from './pages/Properties.jsx'
 
 export default function App() {
-  const { user, logout } = useAuth()
+  const { user, isAdmin, logout } = useAuth()
 
   if (!user) return <Login />
 
@@ -20,6 +21,7 @@ export default function App() {
           <NavLink to="/orders">Bestellungen</NavLink>
           <NavLink to="/customers">Kunden</NavLink>
           <NavLink to="/products">Produkte</NavLink>
+          {isAdmin && <NavLink to="/properties">Konfiguration</NavLink>}
         </nav>
         <span className="spacer" />
         <span className="muted">{user}</span>
@@ -31,6 +33,7 @@ export default function App() {
           <Route path="/orders" element={<Orders />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/products" element={<Products />} />
+          {isAdmin && <Route path="/properties" element={<Properties />} />}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </main>
