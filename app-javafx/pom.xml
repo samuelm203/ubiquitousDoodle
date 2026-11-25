@@ -30,6 +30,10 @@
             <artifactId>backend-persistence-inmemory</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.example.orders</groupId>
+            <artifactId>backend-persistence-files</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>

@@ -2,6 +2,9 @@ package com.example.orders.javafx;
 
 import com.example.orders.Backend;
 import com.example.orders.DemoData;
+import com.example.orders.PropertiesModule;
+import com.example.orders.persistence.files.DemoProperties;
+import com.example.orders.persistence.files.FilePropertiesRepository;
 import com.example.orders.persistence.inmemory.InMemoryBackend;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
@@ -12,6 +15,8 @@ import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,11 +30,18 @@ public class OrdersApp extends Application {
         Backend backend = InMemoryBackend.create();
         DemoData.seed(backend);
 
-        List<Refreshable> tabs = List.of(
+        List<Refreshable> tabs = new ArrayList<>(List.of(
                 new DashboardTab(backend),
                 new OrdersTab(backend),
                 new CustomersTab(backend),
-                new ProductsTab(backend));
+                new ProductsTab(backend)));
+        // Die Desktop-App hat keinen Login: die Rolle kommt aus -Dorders.role bzw. $ORDERS_ROLE (Standard USER).
+        // Die Firmenkonfiguration gibt es nur für ADMIN; ohne ADMIN wird sie gar nicht erst aufgebaut.
+        if (isAdmin()) {
+            Path root = Path.of(System.getProperty("orders.properties.root", "./data/properties"));
+            DemoProperties.generateIfEmpty(root);
+            tabs.add(new PropertiesTab(new PropertiesModule(new FilePropertiesRepository(root)).controller));
+        }
 
         TabPane pane = new TabPane();
         for (Refreshable t : tabs) {
@@ -50,6 +62,11 @@ public class OrdersApp extends Application {
             pause.setOnFinished(e -> Platform.exit());
             pause.play();
         }
+    }
+
+    static boolean isAdmin() {
+        String role = System.getProperty("orders.role", System.getenv("ORDERS_ROLE"));
+        return "ADMIN".equalsIgnoreCase(role);
     }
 
     public static void main(String[] args) {
